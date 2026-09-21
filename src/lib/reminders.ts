@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { db } from "@/db";
 import { reminderLog, workspaces } from "@/db/schema";
 import { getSubscriptionViews } from "./queries";
+import { inZone } from "./renewal";
 import { formatMoney, formatDate, type Currency } from "./money";
 
 export type ReminderResult = {
@@ -25,7 +26,7 @@ function thresholds(): number[] {
  * spec §5.5 — eşik günlerdeki aktif abonelikleri bulur, reminder_log'da aynı
  * (subscription_id, due_date, days_before) üçlüsü yoksa gönderir ve loglar.
  */
-export async function runReminders(today = new Date()): Promise<ReminderResult> {
+export async function runReminders(today = inZone()): Promise<ReminderResult> {
   const days = thresholds();
   // Sistem görevi: her workspace kendi içinde değerlendirilir.
   const allWorkspaces = await db

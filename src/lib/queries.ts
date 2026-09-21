@@ -10,7 +10,13 @@ import {
   type Account,
   type Subscription,
 } from "@/db/schema";
-import { nextRenewal, daysLeft, renewalStatus, type RenewalStatus } from "./renewal";
+import {
+  nextRenewal,
+  daysLeft,
+  renewalStatus,
+  inZone,
+  type RenewalStatus,
+} from "./renewal";
 import { latestRates, totalsByCurrency, toTry, type Currency } from "./money";
 
 export type SubscriptionView = Subscription & {
@@ -27,7 +33,7 @@ export type SubscriptionView = Subscription & {
  */
 export async function getSubscriptionViews(
   workspaceId: string,
-  today = new Date(),
+  today = inZone(),
 ): Promise<SubscriptionView[]> {
   const rows = await db
     .select()
@@ -130,7 +136,7 @@ export async function getSummary(views: SubscriptionView[]) {
 export async function getSubscriptionDetail(
   id: string,
   workspaceId: string,
-  today = new Date(),
+  today = inZone(),
 ) {
   // Başka workspace'in kaydı istenirse bulunamamış gibi davranılır.
   const view = (await getSubscriptionViews(workspaceId, today)).find(
