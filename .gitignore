@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# proje
+.env
+data/*.db
+data/*.db-*
+backups/
+logs/
+
+# launchd: şablondan üretilen yerel kopyalar
+ops/*.plist
