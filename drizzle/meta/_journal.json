@@ -8,6 +8,13 @@
       "when": 1789481326598,
       "tag": "0000_deep_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789991484423,
+      "tag": "0001_workspaces",
+      "breakpoints": true
     }
   ]
 }
