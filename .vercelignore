@@ -1,0 +1,11 @@
+# Vercel dağıtımında gereksiz / yanıltıcı dosyalar.
+# Dockerfile kökte durduğunda Vercel framework algılamasını şaşırtabiliyor.
+Dockerfile
+ops/
+backups/
+logs/
+data/
+docs/
+tests/
+*.md
+!README.md
