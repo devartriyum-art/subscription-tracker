@@ -1,5 +1,13 @@
 {
   "crons": [
     { "path": "/api/cron/daily", "schedule": "0 6 * * *" }
-  ]
+  ],
+  "build": {
+    "env": {
+      "TZ": "Europe/Istanbul"
+    }
+  },
+  "env": {
+    "TZ": "Europe/Istanbul"
+  }
 }
