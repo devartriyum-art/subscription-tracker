@@ -7,6 +7,8 @@
 import "dotenv/config";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import { createClient } from "@libsql/client";
+import { drizzle as drizzleLibsql } from "drizzle-orm/libsql";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { randomUUID, randomInt } from "node:crypto";
@@ -22,24 +24,44 @@ async function main() {
     process.exit(1);
   }
 
-  const raw = process.env.DATABASE_URL ?? "file:./data/app.db";
-  const file = raw.replace(/^file:/, "");
-  const dbPath = path.isAbsolute(file) ? file : path.join(process.cwd(), file);
-  const sqlite = new Database(dbPath);
-  sqlite.pragma("foreign_keys = ON");
-  const db = drizzle(sqlite, { schema });
+  // TURSO_DATABASE_URL varsa buluta, yoksa yerel dosyaya yazar.
+  const tursoUrl = process.env.TURSO_DATABASE_URL;
+  let db;
+  let sqlite: Database.Database | null = null;
+
+  if (tursoUrl) {
+    const client = createClient({
+      url: tursoUrl,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
+    db = drizzleLibsql(client, { schema }) as unknown as ReturnType<typeof drizzle>;
+    console.log("Hedef: Turso (bulut)");
+  } else {
+    const raw = process.env.DATABASE_URL ?? "file:./data/app.db";
+    const file = raw.replace(/^file:/, "");
+    const dbPath = path.isAbsolute(file) ? file : path.join(process.cwd(), file);
+    sqlite = new Database(dbPath);
+    sqlite.pragma("foreign_keys = ON");
+    db = drizzle(sqlite, { schema });
+    console.log("Hedef: yerel dosya (" + dbPath + ")");
+  }
   const now = Math.floor(Date.now() / 1000);
 
-  if (db.select().from(schema.users).where(eq(schema.users.email, email)).get()) {
+  const existing = await db
+    .select()
+    .from(schema.users)
+    .where(eq(schema.users.email, email.toLowerCase()))
+    .get();
+
+  if (existing) {
     console.error(`Bu e-posta zaten kayıtlı: ${email}`);
     process.exit(1);
   }
 
-  let workspace = await db
-    .select()
-    .from(schema.workspaces)
-    .all()
-    .find((w) => w.name.toLowerCase() === workspaceName.toLowerCase());
+  const allWorkspaces = await db.select().from(schema.workspaces).all();
+  let workspace = allWorkspaces.find(
+    (w) => w.name.toLowerCase() === workspaceName.toLowerCase(),
+  );
 
   if (!workspace) {
     workspace = { id: randomUUID(), name: workspaceName, createdAt: now };
@@ -61,7 +83,7 @@ async function main() {
     })
     .run();
 
-  sqlite.close();
+  sqlite?.close();
 
   console.log(`
   Kullanıcı oluşturuldu
