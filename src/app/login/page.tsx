@@ -14,6 +14,10 @@ export default async function LoginPage({
   async function login(formData: FormData) {
     "use server";
     const next = (formData.get("next") as string) || "/";
+
+    // signIn kendi yönlendirmesini yapar ve bunu bir hata fırlatarak
+    // bildirir. AuthError dışındaki her şey (yönlendirme sinyali dahil)
+    // olduğu gibi yukarı geçmeli — yutulursa istek 500 olur.
     try {
       await signIn("credentials", {
         email: formData.get("email"),
