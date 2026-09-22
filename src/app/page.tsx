@@ -61,8 +61,21 @@ export default async function DashboardPage({
 
           {filtered.length === 0 ? (
             <p className="rounded-xl border border-dashed border-[var(--border)] p-6 text-center text-sm text-[var(--muted)]">
-              Henüz kayıt yok. İlk aboneliği ekle — hesap, tutar ve bir sonraki
-              yenilenme tarihi yeterli.
+              {accounts.length === 0 ? (
+                <>
+                  Başlamak için önce bir hesap ekleyin — aboneliklerin hangi
+                  e-posta ile alındığını buradan takip edersiniz.
+                  <br />
+                  <Link href="/accounts" className="mt-2 inline-block underline">
+                    Hesap ekle
+                  </Link>
+                </>
+              ) : (
+                <>
+                  Henüz kayıt yok. İlk aboneliği ekle — hesap, tutar ve bir
+                  sonraki yenilenme tarihi yeterli.
+                </>
+              )}
             </p>
           ) : (
             <ul className="flex flex-col gap-2 overflow-hidden rounded-xl border border-[var(--border)]">

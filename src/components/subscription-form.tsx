@@ -53,11 +53,12 @@ export function SubscriptionForm({
         <select
           name="accountId"
           required
+          disabled={accounts.length === 0}
           defaultValue={s?.accountId ?? ""}
           className={field}
         >
           <option value="" disabled>
-            Seçin
+            {accounts.length === 0 ? "Önce hesap eklenmeli" : "Seçin"}
           </option>
           {accounts.map((a) => (
             <option key={a.id} value={a.id}>
@@ -65,6 +66,15 @@ export function SubscriptionForm({
             </option>
           ))}
         </select>
+        {accounts.length === 0 ? (
+          <span className="mt-1 block text-xs text-[var(--soon)]">
+            Henüz hesap tanımlı değil. Abonelik eklemeden önce{" "}
+            <a href="/accounts" className="underline">
+              Hesaplar
+            </a>{" "}
+            sayfasından aboneliği barındıran e-posta hesabını ekleyin.
+          </span>
+        ) : null}
       </label>
 
       <label className="text-sm">
